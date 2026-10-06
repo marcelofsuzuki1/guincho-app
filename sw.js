@@ -1,6 +1,7 @@
 // Mantém o app abrindo sem internet.
-const CACHE = "guincho-v2";
-const ARQUIVOS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const CACHE = "guincho-v3";
+const ARQUIVOS = ["./", "./index.html", "./cliente.html", "./estilo.css", "./comum.js",
+  "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQUIVOS)));

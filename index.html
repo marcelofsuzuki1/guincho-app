@@ -7,52 +7,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="estilo.css">
 <title>Guincho</title>
 <style>
-:root{
-  --bg:#f3f4f6;--card:#ffffff;--txt:#111827;--sub:#6b7280;--borda:#e5e7eb;--campo:#ffffff;
-  --pri:#1d4ed8;--ok:#047857;--ok-bg:#ecfdf5;--erro:#b91c1c;--zap:#16a34a;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0b1220;--card:#111a2e;--txt:#e5e7eb;--sub:#9ca3af;--borda:#24314f;--campo:#0b1220;
-  --pri:#3b82f6;--ok:#34d399;--ok-bg:#06291f;--erro:#f87171;--zap:#22c55e;
-}}
-:root[data-theme="dark"]{
-  --bg:#0b1220;--card:#111a2e;--txt:#e5e7eb;--sub:#9ca3af;--borda:#24314f;--campo:#0b1220;
-  --pri:#3b82f6;--ok:#34d399;--ok-bg:#06291f;--erro:#f87171;--zap:#22c55e;
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  padding-bottom:calc(128px + env(safe-area-inset-bottom))}
-header.topo{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;
-  padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top))}
-header.topo h1{margin:0;font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-main{padding:12px 16px;max-width:640px;margin:0 auto}
+body{padding-bottom:calc(140px + env(safe-area-inset-bottom))}
+body.sem-rodape{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .aba{display:none}.aba.ativa{display:block}
-.card{background:var(--card);border:1px solid var(--borda);border-radius:12px;padding:14px;margin-bottom:12px}
-.card h2{margin:0 0 4px;font-size:13px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
-input,select,textarea{width:100%;font:inherit;color:var(--txt);background:var(--campo);border:1px solid var(--borda);
-  border-radius:8px;padding:10px 12px;min-height:44px}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
-textarea{min-height:80px;resize:vertical}
-.duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.com-botao{display:flex;gap:8px}.com-botao input{flex:1;min-width:0}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;cursor:pointer;
-  border:1px solid var(--borda);background:var(--card);color:var(--txt);border-radius:10px;padding:10px 14px;min-height:44px}
-.btn:disabled{opacity:.55}
-.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
-.btn.zap{background:var(--zap);border-color:var(--zap);color:#fff}
-.btn.perigo{color:var(--erro)}
-.btn.bloco{width:100%;margin-top:8px}
-.btn.gps{min-width:48px;padding:0}
-.btn svg{width:20px;height:20px}
-.acoes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.resolvido{font-size:12px;color:var(--sub);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dica{font-size:12px;color:var(--sub);margin:8px 0 0}
-.status{font-size:14px;margin-top:8px;min-height:1em}
-.status.erro{color:var(--erro)}
+.wiz-rodape{bottom:calc(60px + env(safe-area-inset-bottom))}
 .trecho{display:grid;grid-template-columns:1fr 104px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--borda)}
 .trecho:first-of-type{margin-top:12px}
 .trecho .nome{font-size:14px}
@@ -60,18 +21,9 @@ textarea{min-height:80px;resize:vertical}
 label.chk{display:flex;align-items:center;gap:8px;margin:4px 0 0;color:var(--txt);font-size:13px}
 label.chk input{width:20px;height:20px;min-height:0;accent-color:var(--pri)}
 .sempre{font-size:12px;color:var(--sub)}
-.num{text-align:right}
-.res{display:flex;justify-content:space-between;padding:5px 0;color:var(--sub)}
-.res b{color:var(--txt);font-variant-numeric:tabular-nums}
-.total{background:var(--ok-bg);border-radius:10px;padding:12px 14px;margin:10px 0}
-.total .rot{color:var(--ok);font-size:14px}
-.total .v{font-size:34px;font-weight:700;color:var(--ok);font-variant-numeric:tabular-nums}
-.total .det{font-size:12px;color:var(--ok)}
-.neg{color:var(--erro)!important}
-.barra{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:5;background:var(--card);
-  border-top:1px solid var(--borda);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.barra .v{font-size:20px;font-weight:700;color:var(--ok);font-variant-numeric:tabular-nums}
-.barra .s{font-size:12px;color:var(--sub);text-align:right}
+.conferir{font-size:13px;color:var(--sub);margin-top:10px}
+.conferir div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 0}
+.conferir b{color:var(--txt);font-weight:600}
 nav.inferior{position:fixed;left:0;right:0;bottom:0;z-index:6;height:calc(60px + env(safe-area-inset-bottom));
   padding-bottom:env(safe-area-inset-bottom);background:var(--card);border-top:1px solid var(--borda);
   display:grid;grid-template-columns:repeat(3,1fr)}
@@ -92,10 +44,7 @@ nav.inferior svg{width:24px;height:24px}
 .vazio{text-align:center;color:var(--sub);padding:32px 0}
 .totais{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:14px}
 .totais span{color:var(--sub)}.totais b{display:block;color:var(--txt);font-size:16px;font-variant-numeric:tabular-nums}
-#toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;
-  background:#111827;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;max-width:calc(100% - 32px);
-  opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.ver{opacity:1}
+#linkCliente{font-size:13px;margin-top:10px}
 #impressao{display:none}
 @media print{
   body{background:#fff;padding:0}
@@ -116,98 +65,118 @@ nav.inferior svg{width:24px;height:24px}
 <header class="topo"><h1 id="titulo">Nova viagem</h1></header>
 
 <main>
-<!-- ================= VIAGEM ================= -->
+<!-- ================= VIAGEM (passo a passo) ================= -->
 <section id="aba-viagem" class="aba ativa">
-  <div class="card">
-    <h2>Cliente e veículo</h2>
-    <div class="duas">
-      <div><label for="fData">Data</label><input id="fData" type="date"></div>
-      <div><label for="fStatus">Situação</label><select id="fStatus"></select></div>
-    </div>
-    <label for="fCliente">Cliente</label><input id="fCliente" autocomplete="off">
-    <label for="fTelefone">Telefone (WhatsApp)</label><input id="fTelefone" type="tel" inputmode="tel" autocomplete="off">
-    <div class="duas">
-      <div><label for="fVeiculo">Veículo</label><input id="fVeiculo" autocomplete="off"></div>
-      <div><label for="fPlaca">Placa</label><input id="fPlaca" autocomplete="off" style="text-transform:uppercase"></div>
+  <div class="wiz-progresso"></div>
+  <div class="wiz-cab"><div class="wiz-num"></div><div class="wiz-titulo"></div></div>
+
+  <div class="passo" data-titulo="Cliente e veículo">
+    <div class="card">
+      <label for="fCliente" style="margin-top:0">Nome do cliente</label><input id="fCliente" autocomplete="off" enterkeyhint="next">
+      <label for="fTelefone">Telefone (WhatsApp)</label><input id="fTelefone" type="tel" inputmode="tel" autocomplete="off" enterkeyhint="next">
+      <div class="duas">
+        <div><label for="fVeiculo">Veículo</label><input id="fVeiculo" autocomplete="off" enterkeyhint="next"></div>
+        <div><label for="fPlaca">Placa</label><input id="fPlaca" autocomplete="off" style="text-transform:uppercase" enterkeyhint="next"></div>
+      </div>
+      <div class="duas">
+        <div><label for="fData">Data</label><input id="fData" type="date"></div>
+        <div><label for="fStatus">Situação</label><select id="fStatus"></select></div>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Itinerário</h2>
-    <label for="fBase">Base (saída)</label>
-    <div class="com-botao"><input id="fBase" autocomplete="off">
-      <button class="btn gps" type="button" data-gps="fBase" aria-label="Usar minha localização"></button></div>
-    <div class="resolvido" id="rBase"></div>
-
-    <label for="fPartida">Retirada (onde está o veículo)</label>
-    <div class="com-botao"><input id="fPartida" autocomplete="off">
-      <button class="btn gps" type="button" data-gps="fPartida" aria-label="Usar minha localização"></button></div>
-    <div class="resolvido" id="rPartida"></div>
-
-    <label for="fDescarga">Descarregamento</label>
-    <div class="com-botao"><input id="fDescarga" autocomplete="off">
-      <button class="btn gps" type="button" data-gps="fDescarga" aria-label="Usar minha localização"></button></div>
-    <div class="resolvido" id="rDescarga"></div>
-
-    <p class="dica">Use “Rua, número, cidade, UF”. O botão do alvo pega o GPS do celular.</p>
-    <div class="acoes">
-      <button class="btn pri" type="button" id="btCalcular">Calcular km</button>
-      <button class="btn" type="button" id="btMapa">Ver no mapa</button>
-    </div>
-    <div class="status" id="statusRota"></div>
-
-    <div class="trecho">
-      <div><div class="nome">Base → Retirada</div>
-        <label class="chk"><input type="checkbox" id="fCobrarIda"> cobrar do cliente</label></div>
-      <input id="fKmIda" class="num" inputmode="decimal" placeholder="km">
-    </div>
-    <div class="trecho">
-      <div><div class="nome">Retirada → Descarregamento</div><div class="sempre">sempre cobrado</div></div>
-      <input id="fKmCarga" class="num" inputmode="decimal" placeholder="km">
-    </div>
-    <div class="trecho">
-      <div><div class="nome">Descarregamento → Base</div>
-        <label class="chk"><input type="checkbox" id="fCobrarRetorno"> cobrar do cliente</label></div>
-      <input id="fKmVolta" class="num" inputmode="decimal" placeholder="km">
+  <div class="passo" data-titulo="Onde está o veículo?">
+    <div class="card">
+      <button class="btn pri grande" type="button" data-gps="fPartida"><span>Estou no local — usar GPS</span></button>
+      <div class="ou">ou digite o endereço</div>
+      <label for="fPartida">Local de retirada</label>
+      <div class="com-botao"><input id="fPartida" autocomplete="off" enterkeyhint="next" placeholder="Rua, número, cidade, UF">
+        <button class="btn gps" type="button" data-gps="fPartida" aria-label="Usar minha localização"></button></div>
+      <div class="resolvido" id="rPartida"></div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Valores</h2>
-    <div class="duas">
-      <div><label for="fDiesel">Diesel (R$/L)</label><input id="fDiesel" class="num" inputmode="decimal"></div>
-      <div><label for="fConsumo">Consumo (km/L)</label><input id="fConsumo" class="num" inputmode="decimal"></div>
-      <div><label for="fSaida">Taxa de saída (R$)</label><input id="fSaida" class="num" inputmode="decimal"></div>
-      <div><label for="fValorKm">Valor por km (R$)</label><input id="fValorKm" class="num" inputmode="decimal"></div>
+  <div class="passo" data-titulo="Para onde levar?">
+    <div class="card">
+      <label for="fDescarga" style="margin-top:0">Local de descarregamento</label>
+      <div class="com-botao"><input id="fDescarga" autocomplete="off" enterkeyhint="next" placeholder="Rua, número, cidade, UF">
+        <button class="btn gps" type="button" data-gps="fDescarga" aria-label="Usar minha localização"></button></div>
+      <div class="resolvido" id="rDescarga"></div>
+      <p class="dica">Em rodovia, cole a coordenada do Google Maps (ex.: -23.5505, -46.6333).</p>
     </div>
-    <label for="fAjuste">Acréscimo / desconto (R$, use - para desconto)</label>
-    <input id="fAjuste" class="num" inputmode="text" placeholder="0,00">
-    <label for="fObs">Observações</label>
-    <textarea id="fObs"></textarea>
   </div>
 
-  <div class="card" id="cardResumo">
-    <h2>Resumo</h2>
-    <div class="res">Km total rodado <b id="rsKmTotal"></b></div>
-    <div class="res">Km cobrado <b id="rsKmCobrado"></b></div>
-    <div class="res">Diesel gasto <b id="rsLitros"></b></div>
-    <div class="res">Custo do diesel <b id="rsCusto" class="neg"></b></div>
-    <div class="total">
-      <div class="rot">Valor para o cliente</div>
-      <div class="v" id="rsValor"></div>
-      <div class="det" id="rsDetalhe"></div>
-    </div>
-    <div class="res">Sobra após diesel <b id="rsLucro"></b></div>
-    <div class="res">Margem <b id="rsMargem"></b></div>
+  <div class="passo" data-titulo="Distâncias">
+    <div class="card">
+      <label for="fBase" style="margin-top:0">Saída do guincho (base)</label>
+      <div class="com-botao"><input id="fBase" autocomplete="off" enterkeyhint="next">
+        <button class="btn gps" type="button" data-gps="fBase" aria-label="Usar minha localização"></button></div>
+      <div class="resolvido" id="rBase"></div>
+      <div class="acoes">
+        <button class="btn" type="button" id="btCalcular">Recalcular km</button>
+        <button class="btn" type="button" id="btMapa">Ver no mapa</button>
+      </div>
+      <div class="status" id="statusRota"></div>
+      <div class="conferir" id="conferir"></div>
 
-    <button class="btn pri bloco" type="button" id="btSalvar">Salvar viagem</button>
-    <div class="acoes">
-      <button class="btn zap" type="button" id="btZap">WhatsApp</button>
-      <button class="btn" type="button" id="btPdf">PDF</button>
-      <button class="btn" type="button" id="btNova">Nova viagem</button>
-      <button class="btn" type="button" id="btDuplicar">Duplicar</button>
+      <div class="trecho">
+        <div><div class="nome">Base → Retirada</div>
+          <label class="chk"><input type="checkbox" id="fCobrarIda"> cobrar do cliente</label></div>
+        <input id="fKmIda" inputmode="decimal" placeholder="km">
+      </div>
+      <div class="trecho">
+        <div><div class="nome">Retirada → Descarregamento</div><div class="sempre">sempre cobrado</div></div>
+        <input id="fKmCarga" inputmode="decimal" placeholder="km">
+      </div>
+      <div class="trecho">
+        <div><div class="nome">Descarregamento → Base</div>
+          <label class="chk"><input type="checkbox" id="fCobrarRetorno"> cobrar do cliente</label></div>
+        <input id="fKmVolta" inputmode="decimal" placeholder="km">
+      </div>
     </div>
-    <button class="btn perigo bloco" type="button" id="btExcluir">Excluir esta viagem</button>
+  </div>
+
+  <div class="passo" data-titulo="Valores">
+    <div class="card">
+      <div class="duas">
+        <div><label for="fDiesel" style="margin-top:0">Diesel (R$/L)</label><input id="fDiesel" class="num" inputmode="decimal"></div>
+        <div><label for="fConsumo" style="margin-top:0">Consumo (km/L)</label><input id="fConsumo" class="num" inputmode="decimal"></div>
+        <div><label for="fSaida">Taxa de saída (R$)</label><input id="fSaida" class="num" inputmode="decimal"></div>
+        <div><label for="fValorKm">Valor por km (R$)</label><input id="fValorKm" class="num" inputmode="decimal"></div>
+      </div>
+      <label for="fAjuste">Acréscimo / desconto (R$, use - para desconto)</label>
+      <input id="fAjuste" class="num" inputmode="text" placeholder="0,00">
+      <label for="fObs">Observações</label>
+      <textarea id="fObs"></textarea>
+    </div>
+  </div>
+
+  <div class="passo" data-titulo="Resumo">
+    <div class="card">
+      <div class="res">Cliente <b id="rsCliente"></b></div>
+      <div class="res">Retirada <b id="rsPartida"></b></div>
+      <div class="res">Destino <b id="rsDescarga"></b></div>
+      <div class="res">Km total rodado <b id="rsKmTotal"></b></div>
+      <div class="res">Km cobrado <b id="rsKmCobrado"></b></div>
+      <div class="res">Diesel gasto <b id="rsLitros"></b></div>
+      <div class="res">Custo do diesel <b id="rsCusto" class="neg"></b></div>
+      <div class="total">
+        <div class="rot">Valor para o cliente</div>
+        <div class="v" id="rsValor"></div>
+        <div class="det" id="rsDetalhe"></div>
+      </div>
+      <div class="res">Sobra após diesel <b id="rsLucro"></b></div>
+      <div class="res">Margem <b id="rsMargem"></b></div>
+
+      <button class="btn pri bloco" type="button" id="btSalvar">Salvar viagem</button>
+      <div class="acoes">
+        <button class="btn zap" type="button" id="btZap">WhatsApp</button>
+        <button class="btn" type="button" id="btPdf">PDF</button>
+        <button class="btn" type="button" id="btNova">Nova viagem</button>
+        <button class="btn" type="button" id="btDuplicar">Duplicar</button>
+      </div>
+      <button class="btn perigo bloco" type="button" id="btExcluir">Excluir esta viagem</button>
+    </div>
   </div>
 </section>
 
@@ -228,12 +197,12 @@ nav.inferior svg{width:24px;height:24px}
   <div id="hLista"></div>
 </section>
 
-<!-- ================= CONFIGURAÇÕES ================= -->
+<!-- ================= AJUSTES ================= -->
 <section id="aba-config" class="aba">
   <div class="card">
-    <h2>Empresa (sai no orçamento)</h2>
+    <h2>Empresa</h2>
     <label for="cEmpresa">Nome</label><input id="cEmpresa">
-    <label for="cTelefone">Telefone</label><input id="cTelefone" type="tel">
+    <label for="cTelefone">WhatsApp da empresa</label><input id="cTelefone" type="tel" inputmode="tel" placeholder="(11) 99999-9999">
     <label for="cDocumento">CNPJ / CPF</label><input id="cDocumento">
   </div>
   <div class="card">
@@ -252,6 +221,18 @@ nav.inferior svg{width:24px;height:24px}
     <button class="btn pri bloco" type="button" id="btSalvarConfig">Salvar configurações</button>
   </div>
   <div class="card">
+    <h2>Link para clientes</h2>
+    <p class="dica" style="margin-top:4px">O cliente abre o link, marca onde está o veículo e o destino, vê uma estimativa com os
+      seus preços e manda o pedido para o WhatsApp da empresa. O pedido chega com um link que abre a viagem já preenchida aqui.</p>
+    <button class="btn pri bloco" type="button" id="btGerarLink">Gerar link do cliente</button>
+    <input id="linkCliente" readonly hidden aria-label="Link do cliente">
+    <div class="acoes" id="acoesLink" hidden>
+      <button class="btn" type="button" id="btCopiarLink">Copiar</button>
+      <button class="btn zap" type="button" id="btEnviarLink">Compartilhar</button>
+    </div>
+    <p class="dica">O link leva os preços e a base salvos. Se mudar algum deles, gere e divulgue o link de novo.</p>
+  </div>
+  <div class="card">
     <h2>Backup / troca com o PC</h2>
     <p class="dica" style="margin-top:4px">Exporte para mandar as viagens ao programa do PC (WhatsApp, Drive, e-mail).
       Importe um arquivo exportado pelo PC para trazer as viagens de lá. Viagens repetidas não são duplicadas.</p>
@@ -260,14 +241,15 @@ nav.inferior svg{width:24px;height:24px}
       <button class="btn" type="button" id="btImportar">Importar</button>
     </div>
     <input type="file" id="arqImportar" accept=".json,application/json" hidden>
-    <p class="dica">Distâncias: OpenStreetMap (Nominatim + OSRM). Os dados ficam só neste celular.</p>
+    <p class="dica">Distâncias: OpenStreetMap (Nominatim + OSRM). As viagens ficam só neste celular.</p>
   </div>
 </section>
 </main>
 
-<div class="barra" id="barra">
-  <div><div class="s" style="text-align:left">Valor para o cliente</div><div class="v" id="bValor"></div></div>
-  <div class="s">Diesel <span id="bCusto"></span><br>Sobra <b id="bLucro"></b></div>
+<div class="wiz-rodape" id="rodape">
+  <button class="btn" type="button" id="btVoltar">Voltar</button>
+  <div class="meio" id="rodapeValor"></div>
+  <button class="btn pri" type="button" id="btProximo">Próximo</button>
 </div>
 
 <nav class="inferior">
@@ -285,11 +267,12 @@ nav.inferior svg{width:24px;height:24px}
 <div id="toast" role="status"></div>
 <div id="impressao"></div>
 
+<script src="comum.js"></script>
 <script>
 "use strict";
-const $ = id => document.getElementById(id);
 const STATUS = ["Orçamento", "Realizada", "Cancelada"];
 const K_VIAGENS = "guincho.viagens", K_CONFIG = "guincho.config";
+const P_DISTANCIAS = 3;   // índice do passo "Distâncias"
 const CONFIG_PADRAO = { EmpresaNome: "Guincho", EmpresaTelefone: "", EmpresaDocumento: "", EnderecoBase: "",
   ConsumoKmL: 4, PrecoDiesel: 6, TaxaSaida: 150, ValorKm: 4, CobrarIda: true, CobrarRetorno: true };
 const VIAGEM_VAZIA = { Id: "", Data: "", Status: "Orçamento", Cliente: "", Telefone: "", Veiculo: "", Placa: "",
@@ -308,51 +291,35 @@ function gravar(chave, valor) {
 let config = { ...CONFIG_PADRAO, ...ler(K_CONFIG, {}) };
 let viagens = (ler(K_VIAGENS, []) || []).map(v => ({ ...VIAGEM_VAZIA, ...v }));
 let idEmEdicao = null;
+let chaveCalculada = "";   // endereços da última rota calculada (evita recalcular à toa)
 try { navigator.storage?.persist?.(); } catch {}
-
-// ---------- números ----------
-function num(s) {
-  s = String(s ?? "").replace(/R\$|\s/g, "");
-  if (!s) return 0;
-  if (!s.includes(",") && (s.match(/\./g) || []).length === 1) return parseFloat(s) || 0;
-  return parseFloat(s.replace(/\./g, "").replace(",", ".")) || 0;
-}
-const fmt = (v, c = 2) => v.toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c });
-const moeda = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const hoje = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
-const dataBr = iso => iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : "";
-const novoId = () => crypto.randomUUID ? crypto.randomUUID()
-  : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); });
-
-function calc(v) {
-  const kmTotal = v.KmBasePartida + v.KmPartidaDescarga + v.KmDescargaBase;
-  const kmCobrado = (v.CobrarIda ? v.KmBasePartida : 0) + v.KmPartidaDescarga + (v.CobrarRetorno ? v.KmDescargaBase : 0);
-  const litros = v.ConsumoKmL > 0 ? kmTotal / v.ConsumoKmL : 0;
-  const custo = litros * v.PrecoDiesel;
-  const valorKm = kmCobrado * v.ValorKm;
-  const valor = v.TaxaSaida + valorKm + v.Ajuste;
-  return { kmTotal, kmCobrado, litros, custo, valorKm, valor, lucro: valor - custo };
-}
-
-// ---------- toast ----------
-let toastTimer;
-function toast(msg) {
-  const t = $("toast"); t.textContent = msg; t.classList.add("ver");
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("ver"), 3200);
-}
 
 // ---------- abas ----------
 function mostrarAba(nome) {
   document.querySelectorAll(".aba").forEach(s => s.classList.toggle("ativa", s.id === "aba-" + nome));
   document.querySelectorAll("nav.inferior button").forEach(b => b.classList.toggle("ativa", b.dataset.aba === nome));
-  $("barra").style.display = nome === "viagem" ? "" : "none";
-  document.body.style.paddingBottom = nome === "viagem" ? "" : "calc(76px + env(safe-area-inset-bottom))";
+  $("rodape").style.display = nome === "viagem" ? "" : "none";
+  document.body.classList.toggle("sem-rodape", nome !== "viagem");
   $("titulo").textContent = nome === "historico" ? "Histórico" : nome === "config" ? "Ajustes" : tituloViagem();
   if (nome === "historico") atualizarHistorico();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll("nav.inferior button").forEach(b => b.addEventListener("click", () => mostrarAba(b.dataset.aba)));
+
+// ---------- passo a passo ----------
+const wiz = criarWizard($("aba-viagem"), {
+  voltar: $("btVoltar"), proximo: $("btProximo"),
+  validar: i => {
+    if (i === 1 && !$("fPartida").value.trim()) return "Informe onde está o veículo (ou use o GPS).";
+    if (i === 2 && !$("fDescarga").value.trim()) return "Informe para onde levar o veículo.";
+    if (i === P_DISTANCIAS && !$("fKmCarga").value.trim()) return "Informe os km (ou toque em Recalcular km).";
+    return "";
+  },
+  aoEntrar: i => {
+    if (i === P_DISTANCIAS && chaveRota() !== chaveCalculada && camposRotaPreenchidos()) calcularKm();
+    recalcular();
+  },
+});
 
 // ---------- formulário ----------
 const camposTexto = { fCliente: "Cliente", fTelefone: "Telefone", fVeiculo: "Veiculo", fPlaca: "Placa",
@@ -362,6 +329,9 @@ const camposNum = { fKmIda: ["KmBasePartida", 1], fKmCarga: ["KmPartidaDescarga"
 
 $("fStatus").innerHTML = STATUS.map(s => `<option>${s}</option>`).join("");
 $("hStatus").innerHTML = ["Todas", ...STATUS].map((s, i) => `<option value="${i ? s : ""}">${s}</option>`).join("");
+
+const chaveRota = () => ["fBase", "fPartida", "fDescarga"].map(id => $(id).value.trim().toLowerCase()).join("|");
+const camposRotaPreenchidos = () => ["fBase", "fPartida", "fDescarga"].every(id => $(id).value.trim());
 
 function lerFormulario() {
   const v = { ...VIAGEM_VAZIA, Id: idEmEdicao || "", Status: $("fStatus").value,
@@ -383,8 +353,8 @@ function preencher(v) {
   }
   $("fCobrarIda").checked = v.CobrarIda;
   $("fCobrarRetorno").checked = v.CobrarRetorno;
-  ["rBase", "rPartida", "rDescarga"].forEach(id => $(id).textContent = "");
-  $("statusRota").textContent = "";
+  ["rBase", "rPartida", "rDescarga", "conferir", "statusRota"].forEach(id => $(id).textContent = "");
+  chaveCalculada = v.KmPartidaDescarga ? chaveRota() : "";
   $("btExcluir").style.display = $("btDuplicar").style.display = idEmEdicao ? "" : "none";
   $("titulo").textContent = tituloViagem();
   recalcular();
@@ -396,15 +366,23 @@ function tituloViagem() {
   return v ? `${dataBr(v.Data)} · ${v.Cliente}` : "Viagem";
 }
 
+const viagemPadrao = () => ({ ...VIAGEM_VAZIA, Data: hoje() + "T00:00:00", EnderecoBase: config.EnderecoBase,
+  PrecoDiesel: config.PrecoDiesel, ConsumoKmL: config.ConsumoKmL, TaxaSaida: config.TaxaSaida,
+  ValorKm: config.ValorKm, CobrarIda: config.CobrarIda, CobrarRetorno: config.CobrarRetorno });
+
 function novaViagem() {
   idEmEdicao = null;
-  preencher({ ...VIAGEM_VAZIA, Data: hoje() + "T00:00:00", EnderecoBase: config.EnderecoBase,
-    PrecoDiesel: config.PrecoDiesel, ConsumoKmL: config.ConsumoKmL, TaxaSaida: config.TaxaSaida,
-    ValorKm: config.ValorKm, CobrarIda: config.CobrarIda, CobrarRetorno: config.CobrarRetorno });
+  preencher(viagemPadrao());
+  wiz.reiniciar();
+  wiz.ir(0);
 }
 
 function recalcular() {
   const v = lerFormulario(), c = calc(v);
+  const curto = s => s.length > 34 ? s.slice(0, 32) + "…" : s;
+  $("rsCliente").textContent = v.Cliente || "—";
+  $("rsPartida").textContent = curto(v.EnderecoPartida) || "—";
+  $("rsDescarga").textContent = curto(v.EnderecoDescarga) || "—";
   $("rsKmTotal").textContent = fmt(c.kmTotal, 1) + " km";
   $("rsKmCobrado").textContent = fmt(c.kmCobrado, 1) + " km";
   $("rsLitros").textContent = fmt(c.litros, 1) + " L";
@@ -417,100 +395,47 @@ function recalcular() {
   $("rsLucro").textContent = moeda(c.lucro);
   $("rsLucro").classList.toggle("neg", c.lucro < 0);
   $("rsMargem").textContent = c.valor > 0 ? Math.round(c.lucro / c.valor * 100) + "%" : "—";
-  $("bValor").textContent = moeda(c.valor);
-  $("bCusto").textContent = moeda(c.custo);
-  $("bLucro").textContent = moeda(c.lucro);
-  $("bLucro").classList.toggle("neg", c.lucro < 0);
+  $("rodapeValor").innerHTML = c.kmTotal > 0
+    ? `Cliente<b>${moeda(c.valor)}</b>sobra ${moeda(c.lucro)}` : "";
 }
 Object.keys(camposNum).forEach(id => $(id).addEventListener("input", recalcular));
 ["fCobrarIda", "fCobrarRetorno"].forEach(id => $(id).addEventListener("change", recalcular));
 
-// ---------- mapas ----------
-const cacheGeo = new Map();
-let ultimaConsulta = 0;
-const RE_COORD = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/;
-
-async function buscar(url) {
-  const espera = ultimaConsulta + 1100 - Date.now();
-  if (espera > 0) await new Promise(r => setTimeout(r, espera));
-  ultimaConsulta = Date.now();
-  const r = await fetch(url, { headers: { "Accept-Language": "pt-BR" }, signal: AbortSignal.timeout(20000) });
-  if (!r.ok) throw new Error(`Serviço de mapas respondeu ${r.status}. Tente de novo ou digite os km.`);
-  return r.json();
-}
-
-const semAcento = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-const RE_NUMERO = /^\d+[A-Za-z]?$/;
-
-// "Rua X, 500, São Paulo, SP" -> "sao paulo" (ignora número, UF, CEP e "Brasil")
-function cidadeDigitada(endereco) {
-  const partes = endereco.split(/,| - /).map(s => s.trim())
-    .filter(s => s && !RE_NUMERO.test(s) && !/^[A-Za-z]{2}$/.test(s) && !/^brasil$/i.test(s) && !/^\d{5}-?\d{3}$/.test(s));
-  return partes.length >= 2 ? semAcento(partes[partes.length - 1]) : "";
-}
-const naCidade = (r, cid) => ["city", "town", "village", "municipality"].some(k => semAcento(r.address?.[k]) === cid);
-const consultarGeo = q => buscar("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&countrycodes=br&q=" + encodeURIComponent(q));
-
-async function localizar(endereco) {
-  endereco = endereco.trim();
-  const m = endereco.match(RE_COORD);
-  if (m) return { lat: +m[1], lon: +m[2], nome: "Coordenada " + endereco };
-  if (cacheGeo.has(endereco.toLowerCase())) return cacheGeo.get(endereco.toLowerCase());
-
-  // O Nominatim às vezes prefere o mesmo número numa rua parecida de outra cidade:
-  // escolhe o candidato que está na cidade digitada; se nenhum, tenta sem o número.
-  const lista = await consultarGeo(endereco);
-  let r = lista[0];
-  const cid = cidadeDigitada(endereco);
-  if (cid) {
-    r = lista.find(x => naCidade(x, cid));
-    if (!r) {
-      const semNumero = endereco.split(",").map(s => s.trim()).filter(s => !RE_NUMERO.test(s)).join(", ");
-      if (semNumero !== endereco) r = (await consultarGeo(semNumero)).find(x => naCidade(x, cid));
-      r ??= lista[0];
-    }
-  }
-  if (!r) throw new Error(`Endereço não encontrado: “${endereco}”. Tente “Rua, número, cidade, UF” ou use o GPS.`);
-  const p = { lat: +r.lat, lon: +r.lon, nome: r.display_name };
-  cacheGeo.set(endereco.toLowerCase(), p);
-  return p;
-}
-
-$("btCalcular").addEventListener("click", async () => {
-  const ids = ["fBase", "fPartida", "fDescarga"], rot = ["rBase", "rPartida", "rDescarga"];
+// ---------- rota ----------
+let calculando = false;
+async function calcularKm() {
   const st = $("statusRota");
   st.classList.remove("erro");
-  if (ids.some(id => !$(id).value.trim())) { st.textContent = "Preencha base, retirada e descarregamento."; st.classList.add("erro"); return; }
-  $("btCalcular").disabled = true;
+  if (!camposRotaPreenchidos()) { st.textContent = "Preencha base, retirada e descarregamento."; st.classList.add("erro"); return; }
+  if (calculando) return;
+  calculando = true;
+  $("btCalcular").disabled = $("btProximo").disabled = true;
+  $("conferir").textContent = "";
   try {
-    const pts = [];
+    const ids = ["fBase", "fPartida", "fDescarga"], pts = [];
     for (let i = 0; i < 3; i++) {
       st.textContent = `Localizando endereço ${i + 1} de 3…`;
-      $(rot[i]).textContent = "";
-      const p = await localizar($(ids[i]).value);
-      $(rot[i]).textContent = "✓ " + p.nome;
-      pts.push(p);
+      pts.push(await localizar($(ids[i]).value));
     }
     st.textContent = "Calculando rota…";
-    const coords = [pts[0], pts[1], pts[2], pts[0]].map(p => `${p.lon},${p.lat}`).join(";");
-    const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=false`, { signal: AbortSignal.timeout(20000) });
-    const j = await r.json();
-    if (j.code !== "Ok") throw new Error("Não foi possível traçar a rota entre os endereços.");
-    const legs = j.routes[0].legs;
-    $("fKmIda").value = fmt(legs[0].distance / 1000, 1);
-    $("fKmCarga").value = fmt(legs[1].distance / 1000, 1);
-    $("fKmVolta").value = fmt(legs[2].distance / 1000, 1);
+    const t = await calcularRota([pts[0], pts[1], pts[2], pts[0]]);
+    $("fKmIda").value = fmt(t[0].km, 1);
+    $("fKmCarga").value = fmt(t[1].km, 1);
+    $("fKmVolta").value = fmt(t[2].km, 1);
+    chaveCalculada = chaveRota();
     recalcular();
-    const seg = legs.reduce((s, l) => s + l.duration, 0);
-    st.textContent = `Tempo de direção estimado: ${Math.floor(seg / 3600)}h${String(Math.round(seg % 3600 / 60)).padStart(2, "0")}. Confira os endereços acima.`;
+    st.textContent = `Tempo de direção estimado: ${duracao(t.reduce((s, x) => s + x.seg, 0))}. Confira os locais encontrados:`;
+    $("conferir").innerHTML = ["Base", "Retirada", "Destino"]
+      .map((r, i) => `<div><b>${r}:</b> ${esc(pts[i].nome)}</div>`).join("");
   } catch (e) {
     st.classList.add("erro");
-    st.textContent = e.name === "TimeoutError" ? "O serviço de mapas demorou demais. Tente de novo ou digite os km."
-      : e instanceof TypeError ? "Sem internet. Digite os km manualmente." : e.message;
+    st.textContent = mensagemErroMapa(e) + " Digite os km manualmente.";
   } finally {
-    $("btCalcular").disabled = false;
+    calculando = false;
+    $("btCalcular").disabled = $("btProximo").disabled = false;
   }
-});
+}
+$("btCalcular").addEventListener("click", calcularKm);
 
 $("btMapa").addEventListener("click", () => {
   const b = $("fBase").value.trim(), p = $("fPartida").value.trim(), d = $("fDescarga").value.trim();
@@ -522,36 +447,36 @@ $("btMapa").addEventListener("click", () => {
   window.open(url, "_blank");
 });
 
-// GPS
-const ICONE_GPS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+// GPS: botões com data-gps preenchem o campo indicado
 document.querySelectorAll("[data-gps]").forEach(bt => {
-  bt.innerHTML = ICONE_GPS;
-  bt.addEventListener("click", () => {
-    if (!navigator.geolocation) { toast("Este aparelho não tem GPS disponível."); return; }
+  if (!bt.innerHTML.trim()) bt.innerHTML = ICONE_GPS; else bt.insertAdjacentHTML("afterbegin", ICONE_GPS);
+  bt.addEventListener("click", async () => {
     bt.disabled = true; toast("Obtendo localização…");
-    navigator.geolocation.getCurrentPosition(async pos => {
-      bt.disabled = false;
+    try {
+      const g = await obterGPS();
       const campo = $(bt.dataset.gps);
-      campo.value = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+      campo.value = g.texto;
+      campo.dispatchEvent(new Event("input"));
+      toast(`Localização obtida (±${g.precisao} m)`);
       const rot = { fBase: "rBase", fPartida: "rPartida", fDescarga: "rDescarga" }[campo.id];
-      toast(`Localização obtida (±${Math.round(pos.coords.accuracy)} m)`);
-      if (!rot) return;
-      try {
-        const j = await buscar(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-        if (j.display_name) $(rot).textContent = "📍 " + j.display_name;
-      } catch {}
-    }, err => {
+      if (rot) {
+        $(rot).textContent = "Buscando endereço…";
+        const nome = await enderecoDaCoordenada(g.lat, g.lon);
+        $(rot).textContent = nome ? "📍 " + nome : "";
+      }
+    } catch (e) {
+      toast(e.message);
+    } finally {
       bt.disabled = false;
-      toast(err.code === 1 ? "Permissão de localização negada." : "Não foi possível obter a localização.");
-    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 30000 });
+    }
   });
 });
 
 // ---------- ações da viagem ----------
 $("btSalvar").addEventListener("click", () => {
   const v = lerFormulario();
-  if (!v.Cliente) { toast("Informe o nome do cliente."); $("fCliente").focus(); return; }
-  v.Id = idEmEdicao || novoId();
+  if (!v.Cliente) { toast("Informe o nome do cliente."); wiz.ir(0); $("fCliente").focus(); return; }
+  v.Id = idEmEdicao || crypto.randomUUID();
   v.AlteradoEm = new Date().toISOString();
   const lista = viagens.slice();
   const i = lista.findIndex(x => x.Id === v.Id);
@@ -564,14 +489,16 @@ $("btSalvar").addEventListener("click", () => {
   toast("Viagem salva.");
 });
 
-$("btNova").addEventListener("click", () => { novaViagem(); window.scrollTo(0, 0); });
+$("btNova").addEventListener("click", novaViagem);
 
 $("btDuplicar").addEventListener("click", () => {
   const o = lerFormulario();
   idEmEdicao = null;
-  preencher({ ...o, Id: "", Data: hoje() + "T00:00:00", Status: "Orçamento", Veiculo: "", Placa: "", Ajuste: 0, Observacoes: "",
-    PrecoDiesel: config.PrecoDiesel, ConsumoKmL: config.ConsumoKmL, TaxaSaida: config.TaxaSaida, ValorKm: config.ValorKm });
-  window.scrollTo(0, 0);
+  preencher({ ...viagemPadrao(), Cliente: o.Cliente, Telefone: o.Telefone, EnderecoBase: o.EnderecoBase,
+    EnderecoPartida: o.EnderecoPartida, EnderecoDescarga: o.EnderecoDescarga,
+    KmBasePartida: o.KmBasePartida, KmPartidaDescarga: o.KmPartidaDescarga, KmDescargaBase: o.KmDescargaBase });
+  wiz.reiniciar(true);
+  wiz.ir(0);
   toast("Cópia criada. Ajuste e salve.");
 });
 
@@ -606,11 +533,8 @@ function textoOrcamento(v) {
 }
 
 $("btZap").addEventListener("click", () => {
-  const v = lerFormulario();
-  let tel = v.Telefone.replace(/\D/g, "");
-  if (tel.length === 10 || tel.length === 11) tel = "55" + tel;
-  const url = (tel.length >= 12 ? `https://wa.me/${tel}` : "https://wa.me/") + "?text=" + encodeURIComponent(textoOrcamento(v));
-  window.open(url, "_blank");
+  const v = lerFormulario(), tel = telZap(v.Telefone);
+  window.open((tel ? `https://wa.me/${tel}` : "https://wa.me/") + "?text=" + encodeURIComponent(textoOrcamento(v)), "_blank");
 });
 
 $("btPdf").addEventListener("click", () => {
@@ -673,16 +597,17 @@ function atualizarHistorico() {
 }
 $("hLista").addEventListener("click", e => {
   const it = e.target.closest(".item");
-  if (!it) return;
-  const v = viagens.find(x => x.Id === it.dataset.id);
+  const v = it && viagens.find(x => x.Id === it.dataset.id);
   if (!v) return;
   idEmEdicao = v.Id;
   preencher(v);
   mostrarAba("viagem");
+  wiz.reiniciar(true);
+  wiz.ir(wiz.total - 1);
 });
 ["hBusca", "hPeriodo", "hStatus"].forEach(id => $(id).addEventListener("input", atualizarHistorico));
 
-// ---------- configurações ----------
+// ---------- ajustes ----------
 function mostrarConfig() {
   $("cEmpresa").value = config.EmpresaNome; $("cTelefone").value = config.EmpresaTelefone;
   $("cDocumento").value = config.EmpresaDocumento; $("cBase").value = config.EnderecoBase;
@@ -698,8 +623,38 @@ $("btSalvarConfig").addEventListener("click", () => {
   if (!gravar(K_CONFIG, novo)) return;
   config = novo;
   mostrarConfig();
+  $("linkCliente").hidden = $("acoesLink").hidden = true;
   if (!idEmEdicao && !$("fCliente").value && !$("fPartida").value) novaViagem();
   toast("Configurações salvas.");
+});
+
+// Link do cliente: leva nome, WhatsApp, coordenada da base e preços
+$("btGerarLink").addEventListener("click", async () => {
+  const zap = telZap(config.EmpresaTelefone);
+  if (!zap) { toast("Salve o WhatsApp da empresa (com DDD) antes."); $("cTelefone").focus(); return; }
+  if (!config.EnderecoBase) { toast("Salve o endereço da base antes."); $("cBase").focus(); return; }
+  if (!(config.ValorKm > 0)) { toast("Salve o valor por km antes."); return; }
+  $("btGerarLink").disabled = true;
+  try {
+    const b = await localizar(config.EnderecoBase);
+    const q = new URLSearchParams({ n: config.EmpresaNome || "Guincho", w: zap, b: `${b.lat.toFixed(5)},${b.lon.toFixed(5)}`,
+      s: String(config.TaxaSaida), k: String(config.ValorKm), i: config.CobrarIda ? "1" : "0", r: config.CobrarRetorno ? "1" : "0" });
+    $("linkCliente").value = new URL("cliente.html", location.href).href.split("#")[0] + "?" + q;
+    $("linkCliente").hidden = $("acoesLink").hidden = false;
+  } catch (e) {
+    toast("Não foi possível localizar a base: " + mensagemErroMapa(e));
+  } finally {
+    $("btGerarLink").disabled = false;
+  }
+});
+$("btCopiarLink").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("linkCliente").value); toast("Link copiado."); }
+  catch { $("linkCliente").select(); toast("Selecione e copie o link."); }
+});
+$("btEnviarLink").addEventListener("click", async () => {
+  const url = $("linkCliente").value, texto = `Peça seu guincho por aqui e veja o valor estimado: ${url}`;
+  if (navigator.share) { try { await navigator.share({ title: config.EmpresaNome, text: texto }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
 });
 
 // ---------- backup ----------
@@ -742,10 +697,36 @@ $("arqImportar").addEventListener("change", async e => {
   }
 });
 
+// ---------- pedido vindo do cliente (link #pedido=...) ----------
+function abrirPedidoDoLink() {
+  const m = location.hash.match(/^#pedido=([\w-]+)$/);
+  if (!m) return false;
+  history.replaceState(null, "", location.pathname + location.search);
+  try {
+    const p = deB64(m[1]);
+    const txt = k => typeof p[k] === "string" ? p[k].slice(0, 500) : "";
+    const n = k => Number.isFinite(+p[k]) ? +p[k] : 0;
+    idEmEdicao = null;
+    preencher({ ...viagemPadrao(), Cliente: txt("Cliente"), Telefone: txt("Telefone"), Veiculo: txt("Veiculo"),
+      Placa: txt("Placa"), EnderecoPartida: txt("EnderecoPartida"), EnderecoDescarga: txt("EnderecoDescarga"),
+      Observacoes: txt("Observacoes"), KmBasePartida: n("KmBasePartida"), KmPartidaDescarga: n("KmPartidaDescarga"),
+      KmDescargaBase: n("KmDescargaBase") });
+    mostrarAba("viagem");
+    wiz.reiniciar(true);
+    wiz.ir(wiz.total - 1);
+    toast(`Pedido de ${txt("Cliente") || "cliente"} carregado. Confira e salve.`);
+    return true;
+  } catch {
+    toast("Link de pedido inválido.");
+    return false;
+  }
+}
+window.addEventListener("hashchange", abrirPedidoDoLink);
+
 // ---------- início ----------
 mostrarConfig();
 novaViagem();
-if (!config.EnderecoBase) { mostrarAba("config"); toast("Preencha a base e seus preços padrão."); }
+if (!abrirPedidoDoLink() && !config.EnderecoBase) { mostrarAba("config"); toast("Preencha a base e seus preços padrão."); }
 if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>

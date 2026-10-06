@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="estilo.css">
+<title>Pedir guincho</title>
+<style>
+body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+.wiz-rodape{bottom:0;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+#toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+.calculando{text-align:center;color:var(--sub);padding:28px 0}
+.aviso{font-size:13px;color:var(--sub);margin:8px 0 0}
+.chegada{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px}
+.chegada svg{width:22px;height:22px;flex:none;color:var(--pri)}
+.invalido{text-align:center;padding:40px 8px;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<header class="topo"><h1 id="nomeEmpresa">Guincho</h1><div class="sub">Pedido de guincho e valor estimado</div></header>
+
+<main>
+<section id="assistente">
+  <div class="wiz-progresso"></div>
+  <div class="wiz-cab"><div class="wiz-num"></div><div class="wiz-titulo"></div></div>
+
+  <div class="passo" data-titulo="Onde está o veículo?">
+    <div class="card">
+      <button class="btn pri grande" type="button" data-gps="cRetirada"><span>Estou no local — usar minha localização</span></button>
+      <div class="ou">ou digite o endereço</div>
+      <label for="cRetirada">Endereço onde o veículo está</label>
+      <input id="cRetirada" autocomplete="street-address" enterkeyhint="next" placeholder="Rua, número, cidade, UF">
+      <div class="resolvido" id="rRetirada"></div>
+      <p class="dica">Em rodovia, informe a rodovia, o km e o sentido.</p>
+    </div>
+  </div>
+
+  <div class="passo" data-titulo="Para onde vamos levar?">
+    <div class="card">
+      <label for="cDestino" style="margin-top:0">Endereço de destino</label>
+      <input id="cDestino" autocomplete="off" enterkeyhint="next" placeholder="Rua, número, cidade, UF">
+      <p class="dica">Ex.: sua casa, oficina ou concessionária.</p>
+    </div>
+  </div>
+
+  <div class="passo" data-titulo="Sobre o veículo">
+    <div class="card">
+      <label for="cVeiculo" style="margin-top:0">Modelo e cor</label>
+      <input id="cVeiculo" autocomplete="off" enterkeyhint="next" placeholder="Ex.: Gol prata">
+      <label for="cPlaca">Placa (opcional)</label>
+      <input id="cPlaca" autocomplete="off" enterkeyhint="next" style="text-transform:uppercase">
+      <label for="cOcorrido">O que aconteceu?</label>
+      <select id="cOcorrido">
+        <option>Pane mecânica / não liga</option>
+        <option>Acidente</option>
+        <option>Pneu furado</option>
+        <option>Bateria</option>
+        <option>Transporte / remoção</option>
+        <option>Outro</option>
+      </select>
+      <label for="cObs">Algo mais que o guincheiro precisa saber? (opcional)</label>
+      <textarea id="cObs" placeholder="Ex.: carro em garagem subsolo, roda travada, ponto de referência…"></textarea>
+    </div>
+  </div>
+
+  <div class="passo" data-titulo="Seus dados">
+    <div class="card">
+      <label for="cNome" style="margin-top:0">Seu nome</label>
+      <input id="cNome" autocomplete="name" enterkeyhint="next">
+      <label for="cTelefone">Seu telefone (WhatsApp)</label>
+      <input id="cTelefone" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="next" placeholder="(11) 99999-9999">
+    </div>
+  </div>
+
+  <div class="passo" data-titulo="Valor estimado">
+    <div class="card" id="estimativa"></div>
+    <a class="btn zap grande" id="btEnviar" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+      Enviar pedido pelo WhatsApp</a>
+    <p class="aviso">Ao enviar, abre o WhatsApp do guincho com seu pedido pronto. É só tocar em enviar.</p>
+  </div>
+</section>
+</main>
+
+<div class="wiz-rodape" id="rodape">
+  <button class="btn" type="button" id="btVoltar">Voltar</button>
+  <div class="meio"></div>
+  <button class="btn pri" type="button" id="btProximo">Próximo</button>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script src="comum.js"></script>
+<script>
+"use strict";
+// Preços e base vêm no link gerado pelo guincheiro (Ajustes > Link para clientes)
+const P = new URLSearchParams(location.search);
+const cfg = {
+  nome: P.get("n") || "Guincho",
+  zap: soDigitos(P.get("w")),
+  base: P.get("b") || "",
+  saida: num(P.get("s")),
+  valorKm: num(P.get("k")),
+  ida: P.get("i") !== "0",
+  volta: P.get("r") !== "0",
+};
+const URL_APP = new URL("./", location.href).href;   // app do guincheiro (index.html)
+
+$("nomeEmpresa").textContent = cfg.nome;
+document.title = `Pedir guincho — ${cfg.nome}`;
+
+if (cfg.zap.length < 12 || !RE_COORD.test(cfg.base) || !(cfg.valorKm > 0)) {
+  $("assistente").innerHTML = `<div class="card invalido">Este link está incompleto.<br>Peça o link correto para o guincho.</div>`;
+  $("rodape").style.display = "none";
+  throw new Error("link incompleto");
+}
+
+let rota = null;          // {pontos, trechos} da última estimativa
+let chaveRota = "";
+let localGps = "";        // endereço aproximado quando o cliente usa o GPS
+
+const wiz = criarWizard($("assistente"), {
+  voltar: $("btVoltar"), proximo: $("btProximo"),
+  validar: i => {
+    if (i === 0 && !$("cRetirada").value.trim()) return "Informe onde está o veículo ou use sua localização.";
+    if (i === 1 && !$("cDestino").value.trim()) return "Informe para onde levar o veículo.";
+    if (i === 2 && !$("cVeiculo").value.trim()) return "Informe o modelo do veículo.";
+    if (i === 3 && !$("cNome").value.trim()) return "Informe seu nome.";
+    if (i === 3 && !telZap($("cTelefone").value)) return "Informe seu telefone com DDD.";
+    return "";
+  },
+  aoEntrar: i => { if (i === wiz.total - 1) estimar(); },
+});
+wiz.ir(0);
+
+// GPS
+document.querySelectorAll("[data-gps]").forEach(bt => {
+  bt.insertAdjacentHTML("afterbegin", ICONE_GPS);
+  bt.addEventListener("click", async () => {
+    bt.disabled = true;
+    $("rRetirada").textContent = "Obtendo sua localização…";
+    try {
+      const g = await obterGPS();
+      $("cRetirada").value = g.texto;
+      $("rRetirada").textContent = "Buscando endereço…";
+      localGps = await enderecoDaCoordenada(g.lat, g.lon);
+      $("rRetirada").textContent = localGps ? "📍 " + localGps : `📍 Localização obtida (±${g.precisao} m)`;
+      wiz.avancar();
+    } catch (e) {
+      $("rRetirada").textContent = "";
+      toast(e.message);
+    } finally {
+      bt.disabled = false;
+    }
+  });
+});
+$("cRetirada").addEventListener("input", () => { localGps = ""; $("rRetirada").textContent = ""; });
+
+function viagemEstimada() {
+  // km com 1 casa, igual ao app do guincheiro, para o valor bater
+  const t = rota.trechos.map(x => Math.round(x.km * 10) / 10);
+  return { KmBasePartida: t[0], KmPartidaDescarga: t[1], KmDescargaBase: t[2],
+    CobrarIda: cfg.ida, CobrarRetorno: cfg.volta, TaxaSaida: cfg.saida, ValorKm: cfg.valorKm,
+    Ajuste: 0, PrecoDiesel: 0, ConsumoKmL: 0 };
+}
+
+async function estimar() {
+  const chave = $("cRetirada").value.trim() + "|" + $("cDestino").value.trim();
+  if (chave === chaveRota && rota) { montarPedido(); return; }
+  const caixa = $("estimativa");
+  caixa.innerHTML = `<div class="calculando">Calculando a rota e o valor…</div>`;
+  $("btEnviar").style.display = "none";
+  $("btProximo").disabled = true;
+  rota = null;
+  try {
+    const [la, lo] = cfg.base.split(",").map(Number);
+    const base = { lat: la, lon: lo };
+    const ret = await localizar($("cRetirada").value);
+    const dest = await localizar($("cDestino").value);
+    rota = { pontos: [base, ret, dest], trechos: await calcularRota([base, ret, dest, base]) };
+    chaveRota = chave;
+    const c = calc(viagemEstimada());
+    caixa.innerHTML = `
+      <div class="total" style="margin-top:0">
+        <div class="rot">Valor estimado do serviço</div>
+        <div class="v">${moeda(c.valor)}</div>
+        <div class="det">${fmt(rota.trechos[1].km, 1)} km até o destino, incluindo o deslocamento do guincho</div>
+      </div>
+      <div class="res">Retirada <b>${esc(curto(ret.nome))}</b></div>
+      <div class="res">Destino <b>${esc(curto(dest.nome))}</b></div>
+      <div class="chegada">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>Tempo de deslocamento do guincho até você: cerca de <b>${duracao(rota.trechos[0].seg)}</b></span>
+      </div>
+      <p class="aviso">Valor calculado pela rota. O valor final é confirmado pelo guincho ao responder o seu pedido.</p>`;
+  } catch (e) {
+    caixa.innerHTML = `<p style="margin:0">Não conseguimos calcular o valor agora (${esc(mensagemErroMapa(e))}).</p>
+      <p class="aviso">Você ainda pode enviar o pedido: o guincho responde com o valor.</p>`;
+  } finally {
+    $("btProximo").disabled = false;
+  }
+  montarPedido();
+}
+
+const curto = s => { const p = s.split(",").map(x => x.trim()); return p.slice(0, 3).join(", "); };
+
+function montarPedido() {
+  const v = rota ? viagemEstimada() : null;
+  const c = v && calc(v);
+  const ret = $("cRetirada").value.trim(), dest = $("cDestino").value.trim();
+  const obs = [`Ocorrido: ${$("cOcorrido").value}`];
+  if (localGps) obs.push(`Local (GPS): ${localGps}`);
+  if ($("cObs").value.trim()) obs.push($("cObs").value.trim());
+  if (c) obs.push(`Estimativa mostrada ao cliente: ${moeda(c.valor)}`);
+
+  const pedido = { Cliente: $("cNome").value.trim(), Telefone: $("cTelefone").value.trim(),
+    Veiculo: $("cVeiculo").value.trim(), Placa: $("cPlaca").value.trim().toUpperCase(),
+    EnderecoPartida: ret, EnderecoDescarga: dest, Observacoes: obs.join("\n"),
+    KmBasePartida: v ? v.KmBasePartida : 0, KmPartidaDescarga: v ? v.KmPartidaDescarga : 0,
+    KmDescargaBase: v ? v.KmDescargaBase : 0 };
+
+  const mapa = rota ? `https://www.google.com/maps/search/?api=1&query=${rota.pontos[1].lat},${rota.pontos[1].lon}` : "";
+  const linhas = ["*Pedido de guincho*", "",
+    `Nome: ${pedido.Cliente}`, `Telefone: ${pedido.Telefone}`,
+    `Veículo: ${[pedido.Veiculo, pedido.Placa].filter(Boolean).join(" ")}`, `Ocorrido: ${$("cOcorrido").value}`, "",
+    `Retirada: ${localGps || ret}`];
+  if (mapa) linhas.push(`Mapa: ${mapa}`);
+  linhas.push(`Destino: ${dest}`);
+  if ($("cObs").value.trim()) linhas.push("", `Obs.: ${$("cObs").value.trim()}`);
+  if (c) linhas.push("", `Distância até o destino: ${fmt(v.KmPartidaDescarga, 1)} km`, `Valor estimado: ${moeda(c.valor)}`);
+  linhas.push("", `Abrir no app do guincho: ${URL_APP}#pedido=${paraB64(pedido)}`);
+
+  $("btEnviar").href = `https://wa.me/${cfg.zap}?text=${encodeURIComponent(linhas.join("\n"))}`;
+  $("btEnviar").style.display = "";
+}
+</script>
+</body>
+</html>

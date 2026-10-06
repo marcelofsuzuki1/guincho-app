@@ -1,7 +1,7 @@
 // Servidor estático só para testar no PC: node servidor-local.js  ->  http://localhost:5180
 const http = require("http"), fs = require("fs"), path = require("path");
 const raiz = __dirname, porta = 5180;
-const tipos = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".png": "image/png",
+const tipos = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".png": "image/png",
   ".webmanifest": "application/manifest+json", ".json": "application/json" };
 
 http.createServer((req, res) => {
