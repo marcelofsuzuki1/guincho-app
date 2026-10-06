@@ -152,7 +152,7 @@ const ICONE_GPS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 // ---------- wizard (passo a passo) ----------
 /**
  * raiz: elemento com .wiz-progresso, .wiz-num, .wiz-titulo e vários .passo[data-titulo].
- * validar(i) devolve mensagem de erro (ou "") antes de avançar do passo i.
+ * validar(i) devolve (ou promete) mensagem de erro, ou "", antes de avançar do passo i.
  * aoEntrar(i) roda sempre que um passo é exibido.
  */
 function criarWizard(raiz, { voltar, proximo, validar = () => "", aoEntrar = () => {} }) {
@@ -182,8 +182,14 @@ function criarWizard(raiz, { voltar, proximo, validar = () => "", aoEntrar = () 
     window.scrollTo(0, 0);
     aoEntrar(atual);
   }
-  function avancar() {
-    const erro = validar(atual);
+  let validando = false;
+  async function avancar() {
+    if (validando) return;
+    validando = true;
+    proximo.disabled = true;
+    let erro;
+    try { erro = await validar(atual); }   // pode consultar o mapa (assíncrono)
+    finally { validando = false; proximo.disabled = false; }
     if (erro) { toast(erro); return; }
     ir(atual + 1);
   }

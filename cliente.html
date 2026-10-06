@@ -16,6 +16,7 @@ body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
 .chegada{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px}
 .chegada svg{width:22px;height:22px;flex:none;color:var(--pri)}
 .invalido{text-align:center;padding:40px 8px;color:var(--sub)}
+.resolvido.erro{white-space:normal;color:var(--erro);font-size:13px}
 </style>
 </head>
 <body>
@@ -42,6 +43,7 @@ body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
     <div class="card">
       <label for="cDestino" style="margin-top:0">Endereço de destino</label>
       <input id="cDestino" autocomplete="off" enterkeyhint="next" placeholder="Rua, número, cidade, UF">
+      <div class="resolvido" id="rDestino"></div>
       <p class="dica">Ex.: sua casa, oficina ou concessionária.</p>
     </div>
   </div>
@@ -123,9 +125,11 @@ let localGps = "";        // endereço aproximado quando o cliente usa o GPS
 
 const wiz = criarWizard($("assistente"), {
   voltar: $("btVoltar"), proximo: $("btProximo"),
-  validar: i => {
+  validar: async i => {
     if (i === 0 && !$("cRetirada").value.trim()) return "Informe onde está o veículo ou use sua localização.";
     if (i === 1 && !$("cDestino").value.trim()) return "Informe para onde levar o veículo.";
+    if (i === 0) return conferirEndereco("cRetirada", "rRetirada");
+    if (i === 1) return conferirEndereco("cDestino", "rDestino");
     if (i === 2 && !$("cVeiculo").value.trim()) return "Informe o modelo do veículo.";
     if (i === 3 && !$("cNome").value.trim()) return "Informe seu nome.";
     if (i === 3 && !telZap($("cTelefone").value)) return "Informe seu telefone com DDD.";
@@ -156,7 +160,32 @@ document.querySelectorAll("[data-gps]").forEach(bt => {
     }
   });
 });
-$("cRetirada").addEventListener("input", () => { localGps = ""; $("rRetirada").textContent = ""; });
+$("cRetirada").addEventListener("input", () => { localGps = ""; limparRotulo("rRetirada"); });
+$("cDestino").addEventListener("input", () => limparRotulo("rDestino"));
+
+function limparRotulo(id) { $(id).textContent = ""; $(id).classList.remove("erro"); }
+
+// Confere no mapa o endereço digitado antes de avançar, para o cliente corrigir erros
+// de digitação ("sao apulo"). Tocar em Próximo de novo com o mesmo texto segue assim mesmo.
+const insistiu = {};
+async function conferirEndereco(campo, rotulo) {
+  const texto = $(campo).value.trim(), r = $(rotulo);
+  if (RE_COORD.test(texto)) return "";            // veio do GPS
+  r.classList.remove("erro");
+  r.textContent = "Conferindo endereço…";
+  try {
+    const p = await localizar(texto);
+    r.textContent = "✓ " + p.nome;
+    return "";
+  } catch (e) {
+    if (!/não encontrado/i.test(e.message) || insistiu[campo] === texto) { limparRotulo(rotulo); return ""; }
+    insistiu[campo] = texto;
+    r.classList.add("erro");
+    r.textContent = "Não encontramos esse endereço no mapa. Confira o nome da rua e da cidade " +
+      "(ex.: Rua das Flores, 120, São Paulo, SP). Para continuar assim mesmo, toque em Próximo de novo.";
+    return "Confira o endereço.";
+  }
+}
 
 function viagemEstimada() {
   // km com 1 casa, igual ao app do guincheiro, para o valor bater
