@@ -96,23 +96,22 @@ body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
 <script src="comum.js"></script>
 <script>
 "use strict";
-// Preços e base vêm no link gerado pelo guincheiro (Ajustes > Link para clientes)
+// Preços vêm no link gerado pelo guincheiro (Ajustes > Link para clientes).
+// A página não sabe onde o guincho está, então a estimativa NÃO inclui o deslocamento
+// do guincho (sair da base deixaria o preço absurdo): só taxa de saída + km retirada -> destino.
 const P = new URLSearchParams(location.search);
 const cfg = {
   nome: P.get("n") || "Guincho",
   zap: soDigitos(P.get("w")),
-  base: P.get("b") || "",
   saida: num(P.get("s")),
   valorKm: num(P.get("k")),
-  ida: P.get("i") !== "0",
-  volta: P.get("r") !== "0",
 };
 const URL_APP = new URL("./", location.href).href;   // app do guincheiro (index.html)
 
 $("nomeEmpresa").textContent = cfg.nome;
 document.title = `Pedir guincho — ${cfg.nome}`;
 
-if (cfg.zap.length < 12 || !RE_COORD.test(cfg.base) || !(cfg.valorKm > 0)) {
+if (cfg.zap.length < 12 || !(cfg.valorKm > 0)) {
   $("assistente").innerHTML = `<div class="card invalido">Este link está incompleto.<br>Peça o link correto para o guincho.</div>`;
   $("rodape").style.display = "none";
   throw new Error("link incompleto");
@@ -161,9 +160,9 @@ $("cRetirada").addEventListener("input", () => { localGps = ""; $("rRetirada").t
 
 function viagemEstimada() {
   // km com 1 casa, igual ao app do guincheiro, para o valor bater
-  const t = rota.trechos.map(x => Math.round(x.km * 10) / 10);
-  return { KmBasePartida: t[0], KmPartidaDescarga: t[1], KmDescargaBase: t[2],
-    CobrarIda: cfg.ida, CobrarRetorno: cfg.volta, TaxaSaida: cfg.saida, ValorKm: cfg.valorKm,
+  const km = Math.round(rota.trechos[0].km * 10) / 10;
+  return { KmBasePartida: 0, KmPartidaDescarga: km, KmDescargaBase: 0,
+    CobrarIda: false, CobrarRetorno: false, TaxaSaida: cfg.saida, ValorKm: cfg.valorKm,
     Ajuste: 0, PrecoDiesel: 0, ConsumoKmL: 0 };
 }
 
@@ -176,26 +175,21 @@ async function estimar() {
   $("btProximo").disabled = true;
   rota = null;
   try {
-    const [la, lo] = cfg.base.split(",").map(Number);
-    const base = { lat: la, lon: lo };
     const ret = await localizar($("cRetirada").value);
     const dest = await localizar($("cDestino").value);
-    rota = { pontos: [base, ret, dest], trechos: await calcularRota([base, ret, dest, base]) };
+    rota = { pontos: [ret, dest], trechos: await calcularRota([ret, dest]) };
     chaveRota = chave;
-    const c = calc(viagemEstimada());
+    const v = viagemEstimada(), c = calc(v);
     caixa.innerHTML = `
       <div class="total" style="margin-top:0">
         <div class="rot">Valor estimado do serviço</div>
         <div class="v">${moeda(c.valor)}</div>
-        <div class="det">${fmt(rota.trechos[1].km, 1)} km até o destino, incluindo o deslocamento do guincho</div>
+        <div class="det">Taxa de saída + ${fmt(v.KmPartidaDescarga, 1)} km do local até o destino</div>
       </div>
       <div class="res">Retirada <b>${esc(curto(ret.nome))}</b></div>
       <div class="res">Destino <b>${esc(curto(dest.nome))}</b></div>
-      <div class="chegada">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span>Tempo de deslocamento do guincho até você: cerca de <b>${duracao(rota.trechos[0].seg)}</b></span>
-      </div>
-      <p class="aviso">Valor calculado pela rota. O valor final é confirmado pelo guincho ao responder o seu pedido.</p>`;
+      <p class="aviso">Valor calculado pela rota. O deslocamento do guincho até você e o valor final são
+        confirmados pelo guincho ao responder o seu pedido.</p>`;
   } catch (e) {
     caixa.innerHTML = `<p style="margin:0">Não conseguimos calcular o valor agora (${esc(mensagemErroMapa(e))}).</p>
       <p class="aviso">Você ainda pode enviar o pedido: o guincho responde com o valor.</p>`;
@@ -222,7 +216,7 @@ function montarPedido() {
     KmBasePartida: v ? v.KmBasePartida : 0, KmPartidaDescarga: v ? v.KmPartidaDescarga : 0,
     KmDescargaBase: v ? v.KmDescargaBase : 0 };
 
-  const mapa = rota ? `https://www.google.com/maps/search/?api=1&query=${rota.pontos[1].lat},${rota.pontos[1].lon}` : "";
+  const mapa = rota ? `https://www.google.com/maps/search/?api=1&query=${rota.pontos[0].lat},${rota.pontos[0].lon}` : "";
   const linhas = ["*Pedido de guincho*", "",
     `Nome: ${pedido.Cliente}`, `Telefone: ${pedido.Telefone}`,
     `Veículo: ${[pedido.Veiculo, pedido.Placa].filter(Boolean).join(" ")}`, `Ocorrido: ${$("cOcorrido").value}`, "",

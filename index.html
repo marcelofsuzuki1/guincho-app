@@ -24,6 +24,7 @@ label.chk input{width:20px;height:20px;min-height:0;accent-color:var(--pri)}
 .conferir{font-size:13px;color:var(--sub);margin-top:10px}
 .conferir div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 0}
 .conferir b{color:var(--txt);font-weight:600}
+.btn-link{background:none;border:0;color:var(--pri);font:inherit;font-size:13px;padding:6px 0;cursor:pointer}
 nav.inferior{position:fixed;left:0;right:0;bottom:0;z-index:6;height:calc(60px + env(safe-area-inset-bottom));
   padding-bottom:env(safe-area-inset-bottom);background:var(--card);border-top:1px solid var(--borda);
   display:grid;grid-template-columns:repeat(3,1fr)}
@@ -108,9 +109,13 @@ nav.inferior svg{width:24px;height:24px}
 
   <div class="passo" data-titulo="Distâncias">
     <div class="card">
-      <label for="fBase" style="margin-top:0">Saída do guincho (base)</label>
-      <div class="com-botao"><input id="fBase" autocomplete="off" enterkeyhint="next">
-        <button class="btn gps" type="button" data-gps="fBase" aria-label="Usar minha localização"></button></div>
+      <label for="fOrigem" style="margin-top:0">Saindo de</label>
+      <div class="com-botao"><input id="fOrigem" autocomplete="off" enterkeyhint="next" placeholder="Vazio = sai da base">
+        <button class="btn gps" type="button" data-gps="fOrigem" aria-label="Usar minha localização"></button></div>
+      <div class="resolvido" id="rOrigem"></div>
+      <button type="button" class="btn-link" id="btSairBase">Sair da base em vez da localização atual</button>
+      <label for="fBase">Volta para (base)</label>
+      <input id="fBase" autocomplete="off" enterkeyhint="next">
       <div class="resolvido" id="rBase"></div>
       <div class="acoes">
         <button class="btn" type="button" id="btCalcular">Recalcular km</button>
@@ -120,7 +125,7 @@ nav.inferior svg{width:24px;height:24px}
       <div class="conferir" id="conferir"></div>
 
       <div class="trecho">
-        <div><div class="nome">Base → Retirada</div>
+        <div><div class="nome">Saída → Retirada</div>
           <label class="chk"><input type="checkbox" id="fCobrarIda"> cobrar do cliente</label></div>
         <input id="fKmIda" inputmode="decimal" placeholder="km">
       </div>
@@ -156,6 +161,7 @@ nav.inferior svg{width:24px;height:24px}
       <div class="res">Cliente <b id="rsCliente"></b></div>
       <div class="res">Retirada <b id="rsPartida"></b></div>
       <div class="res">Destino <b id="rsDescarga"></b></div>
+      <div class="res" id="rsChegadaLinha" hidden>Chegada à retirada <b id="rsChegada"></b></div>
       <div class="res">Km total rodado <b id="rsKmTotal"></b></div>
       <div class="res">Km cobrado <b id="rsKmCobrado"></b></div>
       <div class="res">Diesel gasto <b id="rsLitros"></b></div>
@@ -218,6 +224,7 @@ nav.inferior svg{width:24px;height:24px}
     </div>
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="cCobrarIda"> Cobrar km da base até a retirada</label>
     <label class="chk" style="margin-top:8px"><input type="checkbox" id="cCobrarRetorno"> Cobrar km de retorno à base</label>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="cSaidaGps"> Nova viagem sai da minha localização atual (GPS)</label>
     <button class="btn pri bloco" type="button" id="btSalvarConfig">Salvar configurações</button>
   </div>
   <div class="card">
@@ -274,9 +281,10 @@ const STATUS = ["Orçamento", "Realizada", "Cancelada"];
 const K_VIAGENS = "guincho.viagens", K_CONFIG = "guincho.config";
 const P_DISTANCIAS = 3;   // índice do passo "Distâncias"
 const CONFIG_PADRAO = { EmpresaNome: "Guincho", EmpresaTelefone: "", EmpresaDocumento: "", EnderecoBase: "",
-  ConsumoKmL: 4, PrecoDiesel: 6, TaxaSaida: 150, ValorKm: 4, CobrarIda: true, CobrarRetorno: true };
+  ConsumoKmL: 4, PrecoDiesel: 6, TaxaSaida: 150, ValorKm: 4, CobrarIda: true, CobrarRetorno: true, SaidaGps: true };
+// EnderecoSaida: de onde o guincho sai (vazio = da base). KmBasePartida = saída -> retirada.
 const VIAGEM_VAZIA = { Id: "", Data: "", Status: "Orçamento", Cliente: "", Telefone: "", Veiculo: "", Placa: "",
-  EnderecoBase: "", EnderecoPartida: "", EnderecoDescarga: "", KmBasePartida: 0, KmPartidaDescarga: 0, KmDescargaBase: 0,
+  EnderecoBase: "", EnderecoSaida: "", EnderecoPartida: "", EnderecoDescarga: "", KmBasePartida: 0, KmPartidaDescarga: 0, KmDescargaBase: 0,
   CobrarIda: true, CobrarRetorno: true, PrecoDiesel: 0, ConsumoKmL: 0, TaxaSaida: 0, ValorKm: 0, Ajuste: 0,
   Observacoes: "", AlteradoEm: "0001-01-01T00:00:00" };
 
@@ -292,6 +300,8 @@ let config = { ...CONFIG_PADRAO, ...ler(K_CONFIG, {}) };
 let viagens = (ler(K_VIAGENS, []) || []).map(v => ({ ...VIAGEM_VAZIA, ...v }));
 let idEmEdicao = null;
 let chaveCalculada = "";   // endereços da última rota calculada (evita recalcular à toa)
+let chegadaSeg = null;     // tempo de direção saída -> retirada da última rota calculada
+let geracao = 0;           // muda a cada viagem carregada; descarta GPS que chega atrasado
 try { navigator.storage?.persist?.(); } catch {}
 
 // ---------- abas ----------
@@ -323,14 +333,14 @@ const wiz = criarWizard($("aba-viagem"), {
 
 // ---------- formulário ----------
 const camposTexto = { fCliente: "Cliente", fTelefone: "Telefone", fVeiculo: "Veiculo", fPlaca: "Placa",
-  fBase: "EnderecoBase", fPartida: "EnderecoPartida", fDescarga: "EnderecoDescarga", fObs: "Observacoes" };
+  fBase: "EnderecoBase", fOrigem: "EnderecoSaida", fPartida: "EnderecoPartida", fDescarga: "EnderecoDescarga", fObs: "Observacoes" };
 const camposNum = { fKmIda: ["KmBasePartida", 1], fKmCarga: ["KmPartidaDescarga", 1], fKmVolta: ["KmDescargaBase", 1],
   fDiesel: ["PrecoDiesel", 2], fConsumo: ["ConsumoKmL", 1], fSaida: ["TaxaSaida", 2], fValorKm: ["ValorKm", 2], fAjuste: ["Ajuste", 2] };
 
 $("fStatus").innerHTML = STATUS.map(s => `<option>${s}</option>`).join("");
 $("hStatus").innerHTML = ["Todas", ...STATUS].map((s, i) => `<option value="${i ? s : ""}">${s}</option>`).join("");
 
-const chaveRota = () => ["fBase", "fPartida", "fDescarga"].map(id => $(id).value.trim().toLowerCase()).join("|");
+const chaveRota = () => ["fOrigem", "fBase", "fPartida", "fDescarga"].map(id => $(id).value.trim().toLowerCase()).join("|");
 const camposRotaPreenchidos = () => ["fBase", "fPartida", "fDescarga"].every(id => $(id).value.trim());
 
 function lerFormulario() {
@@ -353,8 +363,10 @@ function preencher(v) {
   }
   $("fCobrarIda").checked = v.CobrarIda;
   $("fCobrarRetorno").checked = v.CobrarRetorno;
-  ["rBase", "rPartida", "rDescarga", "conferir", "statusRota"].forEach(id => $(id).textContent = "");
+  ["rBase", "rOrigem", "rPartida", "rDescarga", "conferir", "statusRota"].forEach(id => $(id).textContent = "");
   chaveCalculada = v.KmPartidaDescarga ? chaveRota() : "";
+  chegadaSeg = null;
+  geracao++;
   $("btExcluir").style.display = $("btDuplicar").style.display = idEmEdicao ? "" : "none";
   $("titulo").textContent = tituloViagem();
   recalcular();
@@ -375,6 +387,33 @@ function novaViagem() {
   preencher(viagemPadrao());
   wiz.reiniciar();
   wiz.ir(0);
+  saidaPelaLocalizacao();
+}
+
+/** Preenche "Saindo de" com o GPS atual (se ativado em Ajustes) e recalcula se já passou das distâncias. */
+async function saidaPelaLocalizacao() {
+  const minha = geracao;
+  if (!config.SaidaGps) return recalcularSePreciso(minha);
+  try {
+    const g = await obterGPS();
+    if (minha !== geracao || $("fOrigem").value.trim()) return;   // outra viagem ou já preenchido à mão
+    $("fOrigem").value = g.texto;
+    $("rOrigem").textContent = `📍 Sua localização agora (±${g.precisao} m)`;
+    if (wiz.atual >= P_DISTANCIAS && camposRotaPreenchidos()) {
+      await calcularKm();
+      if (minha === geracao && wiz.atual === wiz.total - 1) toast("Valores recalculados a partir da sua localização.");
+    }
+    const nome = await enderecoDaCoordenada(g.lat, g.lon);
+    if (minha === geracao && nome && $("fOrigem").value === g.texto) $("rOrigem").textContent = "📍 " + nome;
+  } catch {
+    recalcularSePreciso(minha);   // sem GPS: sai da base
+  }
+}
+
+/** Já passou do passo Distâncias com km desatualizados (ex.: pedido do cliente): calcula a partir da base. */
+function recalcularSePreciso(minha) {
+  if (minha === geracao && wiz.atual >= P_DISTANCIAS && camposRotaPreenchidos() && chaveRota() !== chaveCalculada)
+    calcularKm();
 }
 
 function recalcular() {
@@ -397,52 +436,64 @@ function recalcular() {
   $("rsMargem").textContent = c.valor > 0 ? Math.round(c.lucro / c.valor * 100) + "%" : "—";
   $("rodapeValor").innerHTML = c.kmTotal > 0
     ? `Cliente<b>${moeda(c.valor)}</b>sobra ${moeda(c.lucro)}` : "";
+  $("rsChegadaLinha").hidden = chegadaSeg == null;
+  if (chegadaSeg != null) $("rsChegada").textContent = "cerca de " + duracao(chegadaSeg);
 }
 Object.keys(camposNum).forEach(id => $(id).addEventListener("input", recalcular));
 ["fCobrarIda", "fCobrarRetorno"].forEach(id => $(id).addEventListener("change", recalcular));
 
 // ---------- rota ----------
-let calculando = false;
+let calculando = false, refazer = false;
 async function calcularKm() {
   const st = $("statusRota");
   st.classList.remove("erro");
   if (!camposRotaPreenchidos()) { st.textContent = "Preencha base, retirada e descarregamento."; st.classList.add("erro"); return; }
-  if (calculando) return;
+  if (calculando) { refazer = true; return; }   // endereço mudou durante o cálculo: refaz no fim
   calculando = true;
   $("btCalcular").disabled = $("btProximo").disabled = true;
   $("conferir").textContent = "";
   try {
-    const ids = ["fBase", "fPartida", "fDescarga"], pts = [];
-    for (let i = 0; i < 3; i++) {
-      st.textContent = `Localizando endereço ${i + 1} de 3…`;
-      pts.push(await localizar($(ids[i]).value));
+    // Rota: saída (GPS ou base) -> retirada -> descarregamento -> base
+    const nomes = { fOrigem: "Saída", fBase: "Base", fPartida: "Retirada", fDescarga: "Destino" };
+    const ids = Object.keys(nomes).filter(id => $(id).value.trim()), p = {};
+    for (let i = 0; i < ids.length; i++) {
+      st.textContent = `Localizando endereço ${i + 1} de ${ids.length}…`;
+      p[ids[i]] = await localizar($(ids[i]).value);
     }
     st.textContent = "Calculando rota…";
-    const t = await calcularRota([pts[0], pts[1], pts[2], pts[0]]);
+    const t = await calcularRota([p.fOrigem || p.fBase, p.fPartida, p.fDescarga, p.fBase]);
     $("fKmIda").value = fmt(t[0].km, 1);
     $("fKmCarga").value = fmt(t[1].km, 1);
     $("fKmVolta").value = fmt(t[2].km, 1);
     chaveCalculada = chaveRota();
+    chegadaSeg = t[0].seg;
     recalcular();
-    st.textContent = `Tempo de direção estimado: ${duracao(t.reduce((s, x) => s + x.seg, 0))}. Confira os locais encontrados:`;
-    $("conferir").innerHTML = ["Base", "Retirada", "Destino"]
-      .map((r, i) => `<div><b>${r}:</b> ${esc(pts[i].nome)}</div>`).join("");
+    st.textContent = `Chegada à retirada: cerca de ${duracao(t[0].seg)}. Tempo total de direção: ${duracao(t.reduce((s, x) => s + x.seg, 0))}. Confira os locais:`;
+    $("conferir").innerHTML = ids.map(id => `<div><b>${nomes[id]}:</b> ${esc(p[id].nome)}</div>`).join("");
   } catch (e) {
     st.classList.add("erro");
     st.textContent = mensagemErroMapa(e) + " Digite os km manualmente.";
   } finally {
     calculando = false;
     $("btCalcular").disabled = $("btProximo").disabled = false;
+    if (refazer) { refazer = false; calcularKm(); }
   }
 }
 $("btCalcular").addEventListener("click", calcularKm);
 
+$("btSairBase").addEventListener("click", () => {
+  $("fOrigem").value = "";
+  $("rOrigem").textContent = "";
+  calcularKm();
+});
+
 $("btMapa").addEventListener("click", () => {
   const b = $("fBase").value.trim(), p = $("fPartida").value.trim(), d = $("fDescarga").value.trim();
+  const o = $("fOrigem").value.trim() || b;
   if (!p || !d) { toast("Preencha retirada e descarregamento."); return; }
   const u = encodeURIComponent;
   const url = b
-    ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${u(b)}&destination=${u(b)}&waypoints=${u(p)}%7C${u(d)}`
+    ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${u(o)}&destination=${u(b)}&waypoints=${u(p)}%7C${u(d)}`
     : `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${u(p)}&destination=${u(d)}`;
   window.open(url, "_blank");
 });
@@ -458,7 +509,8 @@ document.querySelectorAll("[data-gps]").forEach(bt => {
       campo.value = g.texto;
       campo.dispatchEvent(new Event("input"));
       toast(`Localização obtida (±${g.precisao} m)`);
-      const rot = { fBase: "rBase", fPartida: "rPartida", fDescarga: "rDescarga" }[campo.id];
+      if (campo.id === "fOrigem") calcularKm();
+      const rot = { fOrigem: "rOrigem", fPartida: "rPartida", fDescarga: "rDescarga" }[campo.id];
       if (rot) {
         $(rot).textContent = "Buscando endereço…";
         const nome = await enderecoDaCoordenada(g.lat, g.lon);
@@ -499,6 +551,7 @@ $("btDuplicar").addEventListener("click", () => {
     KmBasePartida: o.KmBasePartida, KmPartidaDescarga: o.KmPartidaDescarga, KmDescargaBase: o.KmDescargaBase });
   wiz.reiniciar(true);
   wiz.ir(0);
+  saidaPelaLocalizacao();
   toast("Cópia criada. Ajuste e salve.");
 });
 
@@ -526,6 +579,7 @@ function textoOrcamento(v) {
   if (v.Ajuste > 0) linhas.push(`Acréscimo: ${moeda(v.Ajuste)}`);
   if (v.Ajuste < 0) linhas.push(`Desconto: − ${moeda(-v.Ajuste)}`);
   linhas.push(`*Total: ${moeda(c.valor)}*`);
+  if (chegadaSeg != null && v.Status === "Orçamento") linhas.push(`Chegada do guincho: cerca de ${duracao(chegadaSeg)}`);
   if (v.Observacoes) linhas.push("", v.Observacoes);
   const contato = [config.EmpresaTelefone, config.EmpresaDocumento].filter(Boolean).join(" · ");
   if (contato) linhas.push("", contato);
@@ -614,12 +668,14 @@ function mostrarConfig() {
   $("cConsumo").value = fmt(config.ConsumoKmL, 1); $("cDiesel").value = fmt(config.PrecoDiesel);
   $("cSaida").value = fmt(config.TaxaSaida); $("cValorKm").value = fmt(config.ValorKm);
   $("cCobrarIda").checked = config.CobrarIda; $("cCobrarRetorno").checked = config.CobrarRetorno;
+  $("cSaidaGps").checked = config.SaidaGps;
 }
 $("btSalvarConfig").addEventListener("click", () => {
   const novo = { EmpresaNome: $("cEmpresa").value.trim(), EmpresaTelefone: $("cTelefone").value.trim(),
     EmpresaDocumento: $("cDocumento").value.trim(), EnderecoBase: $("cBase").value.trim(),
     ConsumoKmL: num($("cConsumo").value), PrecoDiesel: num($("cDiesel").value), TaxaSaida: num($("cSaida").value),
-    ValorKm: num($("cValorKm").value), CobrarIda: $("cCobrarIda").checked, CobrarRetorno: $("cCobrarRetorno").checked };
+    ValorKm: num($("cValorKm").value), CobrarIda: $("cCobrarIda").checked, CobrarRetorno: $("cCobrarRetorno").checked,
+    SaidaGps: $("cSaidaGps").checked };
   if (!gravar(K_CONFIG, novo)) return;
   config = novo;
   mostrarConfig();
@@ -715,6 +771,9 @@ function abrirPedidoDoLink() {
     wiz.reiniciar(true);
     wiz.ir(wiz.total - 1);
     toast(`Pedido de ${txt("Cliente") || "cliente"} carregado. Confira e salve.`);
+    // o cliente só calculou retirada -> destino; refaz com a sua posição (ou a base) e a volta
+    chaveCalculada = "";
+    saidaPelaLocalizacao();
     return true;
   } catch {
     toast("Link de pedido inválido.");

@@ -61,9 +61,10 @@ let ultimaConsulta = 0;
 
 /** Nominatim aceita no máximo 1 consulta por segundo. */
 async function buscar(url) {
-  const espera = ultimaConsulta + 1100 - Date.now();
-  if (espera > 0) await new Promise(r => setTimeout(r, espera));
-  ultimaConsulta = Date.now();
+  // reserva o horário antes de esperar, para consultas simultâneas fazerem fila
+  const agora = Date.now(), inicio = Math.max(agora, ultimaConsulta + 1100);
+  ultimaConsulta = inicio;
+  if (inicio > agora) await new Promise(r => setTimeout(r, inicio - agora));
   const r = await fetch(url, { headers: { "Accept-Language": "pt-BR" }, signal: AbortSignal.timeout(20000) });
   if (!r.ok) throw new Error(`Serviço de mapas respondeu ${r.status}. Tente de novo.`);
   return r.json();
