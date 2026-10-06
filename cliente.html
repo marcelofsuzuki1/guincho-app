@@ -254,7 +254,7 @@ function montarPedido() {
   linhas.push(`Destino: ${dest}`);
   if ($("cObs").value.trim()) linhas.push("", `Obs.: ${$("cObs").value.trim()}`);
   if (c) linhas.push("", `Distância até o destino: ${fmt(v.KmPartidaDescarga, 1)} km`, `Valor estimado: ${moeda(c.valor)}`);
-  linhas.push("", `Abrir no app do guincho: ${URL_APP}#pedido=${paraB64(pedido)}`);
+  linhas.push("", `Para o guincho (uso interno): ${URL_APP}#pedido=${paraB64(pedido)}`);
 
   $("btEnviar").href = `https://wa.me/${cfg.zap}?text=${encodeURIComponent(linhas.join("\n"))}`;
   $("btEnviar").style.display = "";
